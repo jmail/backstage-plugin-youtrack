@@ -1,0 +1,20 @@
+# GitVersion 6.x configuration — https://gitversion.net/docs/reference/configuration
+#
+# The package version is NOT maintained by hand: it is derived from git history
+# (last v* tag + commits since) and injected into package.json by CI.
+#
+# Flow: PR merged into master -> CI computes the next version -> publishes to npm
+# -> tags the commit vX.Y.Z -> creates a GitHub release. Every merge bumps PATCH
+# by default; put a bump token into the PR title / squash commit to change that:
+#   +semver: minor   (or: feature)
+#   +semver: major   (or: breaking)
+#   +semver: none    (or: skip)     -> no release for this merge (enforced by the
+#                                       release job; GitVersion itself would still bump)
+workflow: GitHubFlow/v1
+
+branches:
+  main:
+    # preset already matches ^master$|^main$, sets label '' and increment Patch;
+    # ContinuousDeployment yields the same clean version (e.g. 0.1.2) for every
+    # untagged commit after the last tag, so the release job can tag it as-is.
+    mode: ContinuousDeployment

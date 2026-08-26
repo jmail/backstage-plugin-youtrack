@@ -65,7 +65,29 @@ There is also a standalone dev app backed by an in-memory fake (no backend/proxy
 
 ## Releasing
 
-CI publishes `@jmails/backstage-plugin-youtrack` to npm on every `v*` tag via [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/) (OIDC) — no long-lived token is stored in the repository. The trusted publisher is configured once on npmjs.com (package → Settings → Trusted Publisher → GitHub Actions: `jmail/backstage-plugin-youtrack`, workflow `ci.yml`); provenance attestations are generated automatically. Release = bump `version` in `plugins/youtrack/package.json`, commit, `git tag vX.Y.Z && git push origin vX.Y.Z`. Local dry-run of the package contents: `yarn --cwd plugins/youtrack pack --dry-run`.
+Releases are fully automated and driven by [Conventional Commits](https://www.conventionalcommits.org/): **merging a PR into `master` publishes a new version when there is something to release**.
+
+| Commit / PR title | Result |
+| --- | --- |
+| `fix: …`, `perf: …` | patch — `0.1.1 → 0.1.2` |
+| `feat: …` | minor — `0.1.1 → 0.2.0` |
+| `feat!: …`, `fix!: …`, or a `BREAKING CHANGE:` footer | major — `0.1.1 → 1.0.0` |
+| anything else (`chore:`, `docs:`, `ci:`, `refactor:`, …) | no release; folded into the next one |
+
+Scopes are fine (`feat(card): …`), matching is case-insensitive, and all commits since the last tag are scanned — the PR title (which GitHub puts into the squash or merge commit) as well as the individual PR commits; the highest bump wins.
+
+A major can also be cut from a **release branch**: branch off as `release/2.0.0`, open a PR and merge it with a *merge commit* (not squash — GitVersion reads the version from the branch name in the merge message); `master` then becomes `2.0.0`.
+
+How it works: [GitVersion](https://gitversion.net) ([GitVersion.yml](./GitVersion.yml)) computes the version from the last `v*` tag and the commits since; the `release` job in [ci.yml](./.github/workflows/ci.yml) injects it into `plugins/youtrack/package.json`, builds, publishes to npm via [Trusted Publishing](https://docs.npmjs.com/trusted-publishers/) (OIDC, no stored token, provenance attached), tags the commit `vX.Y.Z` and creates a GitHub release with generated notes.
+
+Consequences:
+
+- `version` in `plugins/youtrack/package.json` is a placeholder (`0.0.0-development`) — never edit it and never tag by hand; tags are the source of truth.
+- The npm Trusted Publisher is registered for the workflow file `ci.yml` (GitHub `jmail/backstage-plugin-youtrack`, no environment) — renaming the file requires updating it on npmjs.com.
+- Re-running a failed release is safe: an already-tagged commit is skipped, an already-published version is not published twice.
+- Escape hatches: `+semver: none` in the PR title merges a `fix:`/`feat:` without releasing it (it ships with the next release); `[skip ci]` skips the whole workflow, tests included.
+
+Local dry-run of the package contents: `yarn --cwd plugins/youtrack pack --dry-run`.
 
 ## License
 
