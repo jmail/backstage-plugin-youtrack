@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /*
  * Minimal mock of the YouTrack REST API for interactive testing of
- * @jmail/backstage-plugin-youtrack. No dependencies, Node 18+.
+ * @jmails/backstage-plugin-youtrack. No dependencies, Node 18+.
  *
  * Implements GET /api/issues with:
  *   - `query`  — supports `tag: {value}`, `#Unresolved`, `sort by: updated desc`

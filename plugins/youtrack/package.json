@@ -1,5 +1,5 @@
 {
-  "name": "@jmail/backstage-plugin-youtrack",
+  "name": "@jmails/backstage-plugin-youtrack",
   "version": "0.1.0",
   "description": "Backstage frontend plugin that shows YouTrack issues for catalog entities",
   "keywords": [
@@ -24,7 +24,7 @@
     "role": "frontend-plugin",
     "pluginId": "youtrack",
     "pluginPackages": [
-      "@jmail/backstage-plugin-youtrack"
+      "@jmails/backstage-plugin-youtrack"
     ]
   },
   "sideEffects": false,

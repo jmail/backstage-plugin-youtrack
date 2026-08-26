@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [master]
     tags: ['v*']
   pull_request:
 
@@ -41,6 +41,6 @@ jobs:
       - run: yarn install --immutable
       - run: yarn tsc
       - run: yarn build
-      - run: yarn workspace @jmail/backstage-plugin-youtrack npm publish --access public
+      - run: yarn workspace @jmails/backstage-plugin-youtrack npm publish --access public
         env:
           YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

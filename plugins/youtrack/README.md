@@ -1,4 +1,4 @@
-# @jmail/backstage-plugin-youtrack
+# @jmails/backstage-plugin-youtrack
 
 A [Backstage](https://backstage.io) frontend plugin that shows [YouTrack](https://www.jetbrains.com/youtrack/) issues on catalog entity pages — the YouTrack counterpart of the Jira entity plugins.
 
@@ -12,7 +12,7 @@ Screenshots: see the [repository README](https://github.com/jmail/backstage-plug
 ## Installation
 
 ```sh
-yarn --cwd packages/app add @jmail/backstage-plugin-youtrack
+yarn --cwd packages/app add @jmails/backstage-plugin-youtrack
 ```
 
 ### 1. Configure the proxy
@@ -73,7 +73,7 @@ In `packages/app/src/components/catalog/EntityPage.tsx`:
 +  EntityYouTrackCard,
 +  EntityYouTrackContent,
 +  isYouTrackAvailable,
-+} from '@jmail/backstage-plugin-youtrack';
++} from '@jmails/backstage-plugin-youtrack';
 
  const overviewContent = (
    <Grid container spacing={3} alignItems="stretch">

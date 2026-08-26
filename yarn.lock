@@ -2736,9 +2736,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jmail/backstage-plugin-youtrack@workspace:plugins/youtrack":
+"@jmails/backstage-plugin-youtrack@workspace:plugins/youtrack":
   version: 0.0.0-use.local
-  resolution: "@jmail/backstage-plugin-youtrack@workspace:plugins/youtrack"
+  resolution: "@jmails/backstage-plugin-youtrack@workspace:plugins/youtrack"
   dependencies:
     "@backstage/catalog-model": "npm:^1.9.0"
     "@backstage/cli": "npm:^0.36.4"
