@@ -64,7 +64,34 @@ metadata:
 
 Tag values may freely contain `:` or `.` — the plugin wraps them in braces (`tag: {svc:my-service}`) as required by the YouTrack query syntax.
 
-### 4. Wire up the entity page
+### 4. Wire it into the app
+
+**New frontend system** (`createApp` from `@backstage/frontend-defaults` — the default for apps scaffolded since Backstage 1.53):
+
+```tsx
+// packages/app/src/App.tsx
+import youtrackPlugin from '@jmails/backstage-plugin-youtrack/alpha';
+
+export default createApp({
+  features: [
+    catalogPlugin,
+    // ...
+    youtrackPlugin,
+  ],
+});
+```
+
+That's all: the plugin contributes an entity card (`entity-card:youtrack/issues`) and an entity tab (`entity-content:youtrack/issues`, path `/youtrack`), both filtered to entities that carry a YouTrack annotation. If your app uses feature discovery (`app.packages: all` in app-config) the explicit import is not even needed. Tweak them like any other extension, e.g. in `app-config.yaml`:
+
+```yaml
+app:
+  extensions:
+    - entity-content:youtrack/issues:
+        config:
+          title: Issues
+```
+
+**Classic frontend system** (`createApp` from `@backstage/app-defaults`, `EntityPage.tsx`):
 
 In `packages/app/src/components/catalog/EntityPage.tsx`:
 
@@ -111,6 +138,7 @@ Entities without a YouTrack annotation don't get the tab (`if={isYouTrackAvailab
 
 | Export | Description |
 | --- | --- |
+| `@jmails/backstage-plugin-youtrack/alpha` (default export) | Plugin for the new frontend system: api + entity card + entity content extensions |
 | `EntityYouTrackCard` | Overview card (props: `title`, `maxItems`, `variant`) |
 | `EntityYouTrackContent` | Entity tab (props: `pageSize`) |
 | `isYouTrackAvailable` | Predicate for `EntityLayout.Route if` / `EntitySwitch.Case` |
@@ -134,7 +162,13 @@ Entities without a YouTrack annotation don't get the tab (`if={isYouTrackAvailab
 
 ## Compatibility
 
-Built and tested against Backstage **1.53.0** (classic frontend system, `@material-ui` v4). The plugin only uses long-stable classic APIs (`createPlugin`, `createRoutableExtension`, `EntityLayout.Route if`), so it is expected to work on a wide range of recent Backstage versions.
+Dependencies track Backstage **1.54** (`@backstage/plugin-catalog-react ^3.2.1`, `@backstage/frontend-plugin-api ^0.18.0`, `@material-ui` v4). Verified end-to-end against a scaffolded app on:
+
+- **Backstage 1.54, new frontend system** (`/alpha` entry point) — card, tab, filter;
+- **Backstage 1.50, new frontend system** — the host keeps its own `plugin-catalog-react` 2.x / `frontend-plugin-api` 0.16 while the plugin brings 3.x / 0.18 alongside; Backstage shares the relevant contexts across copies (version bridge / opaque extension types), so the card and tab still work. Run `yarn dedupe` after installing and expect a slightly larger bundle;
+- **Backstage 1.53, classic frontend system** (`EntityPage.tsx`).
+
+Older hosts are not tested. The plugin only uses long-stable APIs (`createPlugin`/`createRoutableExtension`, `EntityCardBlueprint`/`EntityContentBlueprint`, `ApiBlueprint`).
 
 ## License
 

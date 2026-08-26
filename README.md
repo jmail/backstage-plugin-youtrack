@@ -1,6 +1,6 @@
 # backstage-plugin-youtrack
 
-Monorepo for [`@jmails/backstage-plugin-youtrack`](./plugins/youtrack) — a Backstage frontend plugin that shows YouTrack issues on catalog entity pages (Overview card + full entity tab), talking to YouTrack exclusively through the Backstage proxy.
+Monorepo for [`@jmails/backstage-plugin-youtrack`](./plugins/youtrack) — a Backstage frontend plugin that shows YouTrack issues on catalog entity pages (Overview card + full entity tab), talking to YouTrack exclusively through the Backstage proxy. Works with both the new frontend system (`/alpha` entry point) and the classic one.
 
 **➡ Full installation and configuration docs: [plugins/youtrack/README.md](./plugins/youtrack/README.md)**
 
@@ -34,7 +34,7 @@ yarn build      # backstage-cli package build
 ### Interactive testing without a YouTrack instance
 
 1. Start the mock API: `node mock-youtrack/server.mjs` (listens on `:8090`, serves `GET /api/issues`, asserts a `Bearer` header, honors `query`/`#Unresolved`/`$top`/`$skip`).
-2. Scaffold a Backstage app next to this repo: `npx @backstage/create-app@latest --legacy` (the plugin targets the classic frontend system).
+2. Scaffold a Backstage app next to this repo: `npx @backstage/create-app@latest` (new frontend system) or `npx @backstage/create-app@latest --legacy` (classic frontend system) — the plugin supports both.
 3. Pack the plugin and add the tarball to the app (a `portal:`/`link:` dependency would pull in a
    second copy of React from this repo's `node_modules` — the tarball also matches what npm ships):
 
@@ -59,7 +59,7 @@ yarn build      # backstage-cli package build
      baseUrl: https://example.youtrack.cloud
    ```
 
-5. Wire `EntityYouTrackCard` / `EntityYouTrackContent` into `EntityPage.tsx` (see the plugin README), annotate an example entity with `youtrack.com/tag: svc:example`, and `yarn start`.
+5. Wire the plugin into the app — new frontend system: `import youtrackPlugin from '@jmails/backstage-plugin-youtrack/alpha'` and add it to `features` in `App.tsx`; classic: `EntityYouTrackCard` / `EntityYouTrackContent` in `EntityPage.tsx` (see the plugin README). Annotate an example entity with `youtrack.com/tag: svc:example`, and `yarn start`.
 
 There is also a standalone dev app backed by an in-memory fake (no backend/proxy): `yarn --cwd plugins/youtrack start`.
 
