@@ -1,20 +1,32 @@
 # GitVersion 6.x configuration — https://gitversion.net/docs/reference/configuration
 #
 # The package version is NOT maintained by hand: it is derived from git history
-# (last v* tag + commits since) and injected into package.json by CI.
+# (last v* tag + commits since) and injected into package.json by CI, which then
+# publishes to npm, tags the commit vX.Y.Z and creates a GitHub release.
 #
-# Flow: PR merged into master -> CI computes the next version -> publishes to npm
-# -> tags the commit vX.Y.Z -> creates a GitHub release. Every merge bumps PATCH
-# by default; put a bump token into the PR title / squash commit to change that:
-#   +semver: minor   (or: feature)
-#   +semver: major   (or: breaking)
-#   +semver: none    (or: skip)     -> no release for this merge (enforced by the
-#                                       release job; GitVersion itself would still bump)
+# Conventional Commits decide the bump. All commits since the last tag are
+# scanned (PR commits and the squash/merge commit alike); the highest wins:
+#   fix: ..., perf: ...                      -> patch   (0.1.1 -> 0.1.2)
+#   feat: ...                                -> minor   (0.1.1 -> 0.2.0)
+#   feat!: ..., fix!: ..., BREAKING CHANGE:  -> major   (0.1.1 -> 1.0.0)
+#   anything else (chore:, docs:, ci:, ...)  -> no release, folded into the next one
+# A major can also be cut from a release branch: merge `release/2.0.0` into master
+# with a MERGE COMMIT (not squash) and master becomes 2.0.0.
 workflow: GitHubFlow/v1
+
+# (?m) = ^ matches at every line start, so the token is found in the PR title that
+# GitHub puts into the body of a merge commit, not only in a squash commit subject.
+# (\* )? = GitHub lists the PR's commits as "* message" lines in a squash commit body.
+major-version-bump-message: '(?m)^(\* )?\w+(\([^)]*\))?!:|BREAKING[ -]CHANGE:'
+minor-version-bump-message: '(?m)^(\* )?feat(\([^)]*\))?:'
+patch-version-bump-message: '(?m)^(\* )?(fix|perf)(\([^)]*\))?:'
 
 branches:
   main:
-    # preset already matches ^master$|^main$, sets label '' and increment Patch;
+    # preset already matches ^master$|^main$ and sets label ''.
     # ContinuousDeployment yields the same clean version (e.g. 0.1.2) for every
     # untagged commit after the last tag, so the release job can tag it as-is.
     mode: ContinuousDeployment
+    # No implicit bump: without a fix:/feat:/breaking commit the version stays at
+    # the last tag and CI releases nothing.
+    increment: None
