@@ -14,7 +14,7 @@ jobs:
       - run: corepack enable
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: '.nvmrc'
           cache: yarn
       - run: yarn install --immutable
       - run: yarn tsc
@@ -24,6 +24,11 @@ jobs:
           CI: 'true'
       - run: yarn build
 
+  # Publishes via npm Trusted Publishing (OIDC) — no NPM_TOKEN secret needed.
+  # One-time setup on npmjs.com: package → Settings → Trusted Publisher →
+  # GitHub Actions: user/org "jmail", repository "backstage-plugin-youtrack",
+  # workflow filename "ci.yml". The first version must be published manually
+  # (npm does not allow configuring a trusted publisher before the package exists).
   publish:
     needs: ci
     if: startsWith(github.ref, 'refs/tags/v')
@@ -36,11 +41,14 @@ jobs:
       - run: corepack enable
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: '.nvmrc'
           cache: yarn
+          registry-url: https://registry.npmjs.org
+      # OIDC publishing requires npm >= 11.5.1 — upgrade to be safe regardless of the bundled version
+      - run: npm install -g npm@latest
       - run: yarn install --immutable
       - run: yarn tsc
-      - run: yarn build
-      - run: yarn workspace @jmails/backstage-plugin-youtrack npm publish --access public
-        env:
-          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: yarn workspace @jmails/backstage-plugin-youtrack build
+      # yarn pack runs backstage-cli prepack/postpack (dist entry points, config.schema.json)
+      - run: yarn workspace @jmails/backstage-plugin-youtrack pack --out "${{ github.workspace }}/package.tgz"
+      - run: npm publish "${{ github.workspace }}/package.tgz" --access public

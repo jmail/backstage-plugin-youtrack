@@ -22,7 +22,7 @@ mock-youtrack/      # dependency-free mock of the YouTrack REST API for interact
 
 ## Development
 
-Requirements: Node 22, Yarn 4 (via corepack).
+Requirements: Node 24 (see `.nvmrc`; Node 22 works too), Yarn 4 via corepack.
 
 ```sh
 yarn install
@@ -65,7 +65,7 @@ There is also a standalone dev app backed by an in-memory fake (no backend/proxy
 
 ## Releasing
 
-CI publishes `@jmails/backstage-plugin-youtrack` to npm with `--access public` on every `v*` tag, using the `NPM_TOKEN` repository secret (the npm account must own the `@jmails` scope). Local dry-run: `yarn --cwd plugins/youtrack pack --dry-run`.
+CI publishes `@jmails/backstage-plugin-youtrack` to npm on every `v*` tag via [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/) (OIDC) — no long-lived token is stored in the repository. The trusted publisher is configured once on npmjs.com (package → Settings → Trusted Publisher → GitHub Actions: `jmail/backstage-plugin-youtrack`, workflow `ci.yml`); provenance attestations are generated automatically. Release = bump `version` in `plugins/youtrack/package.json`, commit, `git tag vX.Y.Z && git push origin vX.Y.Z`. Local dry-run of the package contents: `yarn --cwd plugins/youtrack pack --dry-run`.
 
 ## License
 
