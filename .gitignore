@@ -29,3 +29,6 @@ coverage/
 
 # Internal working document, not part of the OSS deliverable
 plan.md
+
+# packed tarballs (yarn pack)
+*.tgz

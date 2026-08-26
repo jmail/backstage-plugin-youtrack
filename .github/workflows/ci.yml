@@ -25,6 +25,7 @@ jobs:
       - run: yarn build
 
   # Publishes via npm Trusted Publishing (OIDC) — no NPM_TOKEN secret needed.
+  # --provenance is explicit: the docs promise it is automatic, in practice it is not always.
   # One-time setup on npmjs.com: package → Settings → Trusted Publisher →
   # GitHub Actions: user/org "jmail", repository "backstage-plugin-youtrack",
   # workflow filename "ci.yml". The first version must be published manually
@@ -51,4 +52,4 @@ jobs:
       - run: yarn workspace @jmails/backstage-plugin-youtrack build
       # yarn pack runs backstage-cli prepack/postpack (dist entry points, config.schema.json)
       - run: yarn workspace @jmails/backstage-plugin-youtrack pack --out "${{ github.workspace }}/package.tgz"
-      - run: npm publish "${{ github.workspace }}/package.tgz" --access public
+      - run: npm publish "${{ github.workspace }}/package.tgz" --access public --provenance
